@@ -12,9 +12,9 @@ aws lambda create-function --function-name ${demo_function} \
 --description "a simple demo lambda" \
 --timeout 900 \
 --memory-size 128 \
---environment "Variables={KeyName1=string,KeyName2=string}" \
+--environment "Variables={Environment=demo}" \
 --tags ${tags}
---vpc-config "SubnetIds=string,string,SecurityGroupIds=string,string"
+
 #
 #[--vpc-config "SubnetIds=string,string,SecurityGroupIds=string,string" \
 #[--publish | --no-publish]
