@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class SQSClientDriver {
     private final Logger logger = LoggerFactory.getLogger(SQSClientDriver.class);
@@ -61,11 +62,14 @@ public class SQSClientDriver {
         var mapper = new ObjectMapper();
         var keys = S3BucketReader.listBucketKeys(this.region, this.bucket);
         logger.debug("{} key(s) found", keys.size());
-        var msgs = new ArrayList<String>(keys.size() * 2);
-        for (int i = 0; i < keys.size(); i++) {
-            var key = keys.get(i);
+        var filteredKeys = keys.stream().filter(key -> key.endsWith(suffix)).collect(Collectors.toList());
+        var msgs = new ArrayList<String>(filteredKeys.size() * 2);
+        logger.debug("{} filtered key(s) found", filteredKeys.size());
+        for (int i = 0; i < filteredKeys.size(); i++) {
+            var key = filteredKeys.get(i);
             var msg = new S3KeyMessage(this.bucket, key);
             var json = mapper.writeValueAsString(msg);
+            logger.debug("{}", json);
             msgs.add(json);
         }
 

@@ -7,7 +7,7 @@ jar_name=sqs-lambda-${version}.jar
 aws lambda create-function --function-name ${demo_function} \
 --runtime java8 \
 --handler dmk.lambda.sqs.DemoIngestHandler \
---code "S3Bucket=${src_s3_bucket},S3Key=${jar_name},S3ObjectVersion=v1" \
+--code "S3Bucket=${src_s3_bucket},S3Key=${jar_name}" \
 --role "${lambda_role}" \
 --description "a simple demo lambda" \
 --timeout 900 \

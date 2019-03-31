@@ -2,7 +2,6 @@
 
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ../env.sh
-source ../acct.sh
 
 # writes fail with out the policy kms:GenerateDataKey
 #key_id=$(aws kms list-keys | jq .Keys[].KeyId | tr -d '"')

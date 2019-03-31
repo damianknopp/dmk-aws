@@ -9,7 +9,7 @@ public class DemoIngestHandler implements RequestHandler<S3KeyMessage, Integer> 
 
     public Integer handleRequest(S3KeyMessage message, Context context) {
         LambdaLogger logger = context.getLogger();
-        logger.log("received : " + message);
+        logger.log("bucket : " + message.getBucket() + " key:" + message.getKey());
         return 0;
     }
 }

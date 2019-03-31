@@ -5,10 +5,15 @@ public class S3KeyMessage {
     private String key;
     private String bucket;
 
+    // noop constructor for JSON serializer
+    public S3KeyMessage() {
+        super();
+    }
+
     public S3KeyMessage(String bucket, String key) {
         super();
-        this.key = key;
         this.bucket = bucket;
+        this.key = key;
     }
 
     public String getKey() {

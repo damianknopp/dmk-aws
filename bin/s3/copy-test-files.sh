@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-cd $( dirname "${BASH_SOURCE[0]}" )
+script_dir=$(dirname "${BASH_SOURCE[0]}")
+cd "${script_dir}"
 source ../env.sh
 
-cd files
+cd ${script_dir}/files
 for f in *.csv; do
     aws s3 cp ${f} s3://${src_s3_bucket}/${f}
 done
