@@ -2,7 +2,6 @@
 
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ../env.sh
-source ../acct.sh
 
 
 echo "delete queue [${queue_name}, ${queue_name}-dead], this may take a minute..."

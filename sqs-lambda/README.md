@@ -10,6 +10,7 @@ mvn clean install
 
 ## Initialize AWS environment
 ```bash
+../bin/s3/create-bucket.sh
 cd aws-setup-terraform
 terraform init
 terraform apply
@@ -18,7 +19,6 @@ terraform apply
 ## To run
 
 ```bash
-../bin/s3/create-bucket.sh
 ../bin/s3/copy-test-files.sh
 ../bin/lambda-java/stage-demo-function.sh
 ../bin/lambda-java/create-demo-function.sh
