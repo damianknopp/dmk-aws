@@ -28,10 +28,10 @@ profile=default
 
 The file is under .gitignore but verify it is never checked into the repo
 
-See, a Java [Kinesis Client Demo](kinesis-client/README.md)
+See, a Java [Kinesis Client Demo](kinesis-client/)
 
-See, a Java [SQS Client Demo](sqs-client/README.md)
+See, a Java [SQS Client Demo](sqs-client/)
 
-See, [Lambdas using Python](lambda-python/README.md)
+See, [Lambdas using Python](lambda-python/)
 
-See, a Java [SQS Lambda](sqs-lambda/README.md)
+See, a Java [SQS Lambda](sqs-lambda/)
