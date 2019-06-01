@@ -10,7 +10,7 @@ profile=${profile:-default}
 version=1.0-SNAPSHOT
 region=us-east-1
 prefix="dknopp"
-stream_name="dmk-test"
+stream_name="${prefix}-test-stream"
 queue_name="${prefix}-test-queue"
 queue_arn="arn:aws:sqs:${region}:${acct}:${queue_name}"
 tags="environment=demo"
