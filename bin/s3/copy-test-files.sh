@@ -6,5 +6,5 @@ source ../env.sh
 
 cd ${script_dir}/files
 for f in *.csv; do
-    aws s3 cp ${f} s3://${src_s3_bucket}/${f}
+    aws --profile ${profile} s3 cp ${f} s3://${src_s3_bucket}/${f}
 done

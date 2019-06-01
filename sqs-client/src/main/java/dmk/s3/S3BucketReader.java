@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +30,20 @@ public class S3BucketReader {
      * @param key
      * @return
      */
-    public static List<String> listBucketKeys(final String region,
-                                              final String bucketName) {
-        var s3 = S3BucketReader.openS3(region);
+    public static List<String> listBucketKeys(final String region, final String profile, final String bucketName) {
+        var s3 = S3BucketReader.openS3(region, profile);
+        return S3BucketReader.listBucketKeys(s3, bucketName);
+    }
+
+    /**
+     * open stream for given s3 bucket and key
+     *
+     * @param region
+     * @param bucketName
+     * @param key
+     * @return
+     */
+    public static List<String> listBucketKeys(final AmazonS3 s3, final String bucketName) {
         var listing = s3.listObjects(bucketName);
         var objectSummaries = listing.getObjectSummaries();
         return objectSummaries.stream().map(summary -> summary.getKey()).collect(Collectors.toList());
@@ -92,7 +105,19 @@ public class S3BucketReader {
     }
 
     private static AmazonS3 openS3(final String region) {
-        return AmazonS3ClientBuilder.standard().withRegion(region)
-                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+        return S3BucketReader.openS3(region, "default");
+    }
+
+    private static AmazonS3 openS3(final String region, final String profileName) {
+//        return AmazonS3ClientBuilder.standard().withRegion(region)
+//                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+        AmazonS3ClientBuilder clientBuilder = AmazonS3ClientBuilder.standard();
+        clientBuilder.setRegion(region);
+        ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+        if (profileName != null) {
+            credentialsProvider = new ProfileCredentialsProvider(profileName);
+        }
+        clientBuilder.setCredentials(credentialsProvider);
+        return clientBuilder.build();
     }
 }

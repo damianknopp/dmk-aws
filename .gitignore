@@ -7,3 +7,5 @@ target/*
 .terraform
 
 acct.sh
+
+build

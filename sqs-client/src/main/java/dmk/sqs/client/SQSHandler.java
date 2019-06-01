@@ -1,6 +1,6 @@
 package dmk.sqs.client;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
@@ -21,10 +21,22 @@ public class SQSHandler {
     private final Logger logger = LoggerFactory.getLogger(SQSHandler.class);
 
     private String queueUrl;
+    private String profileName;
+    private String region;
 
     public SQSHandler(String queueUrl) {
+        this(queueUrl, "default");
+    }
+
+    public SQSHandler(String queueUrl, String profileName) {
+        this(queueUrl, profileName, "us-east-1");
+    }
+
+    public SQSHandler(String queueUrl, String profileName, String region) {
         super();
         this.queueUrl = queueUrl;
+        this.profileName = profileName;
+        this.region = region;
     }
 
     /**
@@ -98,7 +110,15 @@ public class SQSHandler {
      * @return AmazonSQS
      */
     private AmazonSQS connectToSQS() {
-        return AmazonSQSClientBuilder.standard().withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+        // AmazonSQSClientBuilder.standard().withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
+        AmazonSQSClientBuilder clientBuilder = AmazonSQSClientBuilder.standard();
+        clientBuilder.setRegion(region);
+        ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+        if (this.profileName != null) {
+            credentialsProvider = new ProfileCredentialsProvider(this.profileName);
+        }
+        clientBuilder.setCredentials(credentialsProvider);
+        return clientBuilder.build();
     }
 
 }

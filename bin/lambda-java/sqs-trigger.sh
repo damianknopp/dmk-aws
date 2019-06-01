@@ -3,7 +3,7 @@
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ../env.sh
 
-aws lambda create-event-source-mapping \
+aws --profile ${profile} lambda create-event-source-mapping \
  --event-source-arn ${queue_arn}  \
  --function-name ${demo_function} \
  --enabled                        \

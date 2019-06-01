@@ -3,7 +3,7 @@
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ../env.sh
 
-aws s3api create-bucket --bucket ${src_s3_bucket} --region ${region} --acl private
+aws --profile ${profile} s3api create-bucket --bucket ${src_s3_bucket} --region ${region} --acl private
 
 
 cat << EOF > ./put-bucket-encryption.json
@@ -20,8 +20,8 @@ cat << EOF > ./put-bucket-encryption.json
 }
 EOF
 
-aws s3api put-bucket-tagging --bucket ${src_s3_bucket} --tagging "TagSet=[{Key=environment,Value=demo}]"
-aws s3api put-bucket-encryption --bucket ${src_s3_bucket} --cli-input-json file://put-bucket-encryption.json
+aws --profile ${profile} s3api put-bucket-tagging --bucket ${src_s3_bucket} --tagging "TagSet=[{Key=environment,Value=demo}]"
+aws --profile ${profile} s3api put-bucket-encryption --bucket ${src_s3_bucket} --cli-input-json file://put-bucket-encryption.json
 
 echo "visit https://s3.console.aws.amazon.com/s3/buckets"
 

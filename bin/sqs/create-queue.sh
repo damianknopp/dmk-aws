@@ -15,7 +15,7 @@ cat << EOF > ./create-deadletter-queue.json
   "MessageRetentionPeriod": "86400"
 }
 EOF
-aws sqs create-queue --queue-name ${dead_letter_name} --region ${region} --attributes file://create-deadletter-queue.json
+aws --profile ${profile} sqs create-queue --queue-name ${dead_letter_name} --region ${region} --attributes file://create-deadletter-queue.json
 sqs_dead_arn="arn:aws:sqs:${region}:${acct}:${dead_letter_name}"
 
 
@@ -32,7 +32,7 @@ cat << EOF > ./create-sqs-queue.json
 }
 EOF
 #     "KmsMasterKeyId": "${key_id}"
-aws sqs create-queue --queue-name ${queue_name} --region ${region} --attributes file://create-sqs-queue.json
+aws --profile ${profile} sqs create-queue --queue-name ${queue_name} --region ${region} --attributes file://create-sqs-queue.json
 
 echo "visit https://console.aws.amazon.com/sqs/home"
 

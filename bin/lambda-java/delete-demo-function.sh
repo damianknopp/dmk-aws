@@ -3,4 +3,4 @@
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ../env.sh
 
-aws lambda delete-function --function-name ${demo_function}
+aws --profile ${profile} lambda delete-function --function-name ${demo_function}

@@ -20,6 +20,7 @@ public class SQSClientDriver {
     private String queue;
     private String suffix;
     private String prefix;
+    private String profile;
 
     public static void main(String... args) throws Exception {
         System.out.println("Reading from S3 and writing to SQS");
@@ -27,6 +28,7 @@ public class SQSClientDriver {
         var options = new Options();
         options.addRequiredOption("b", "bucket", true, "s3 bucket to list files");
         options.addRequiredOption("r", "region", true, "s3 region");
+        options.addRequiredOption("p", "profile", true, "profile");
         options.addOption("s", "suffix", true, "suffix to use on bucket list");
         options.addRequiredOption("q", "queue", true, "sqs queue to write file names");
 
@@ -35,6 +37,7 @@ public class SQSClientDriver {
         var bucket = cmd.getOptionValue("b");
         var queue = cmd.getOptionValue("q");
         var region = cmd.getOptionValue("r");
+        var profile = cmd.getOptionValue("p");
 
         var suffix = "";
         if (cmd.hasOption("s")) {
@@ -42,14 +45,15 @@ public class SQSClientDriver {
         }
         var logMsg = String.format("region = %s, bucket = %s, queue = %s, suffix = %s", region, bucket, queue, suffix);
         System.out.println(logMsg);
-        var driver = new SQSClientDriver(bucket, queue, region, suffix, "");
+        var driver = new SQSClientDriver(bucket, queue, region, profile, suffix, "");
         driver.listBucketAndWriteToSQS();
     }
 
-    public SQSClientDriver(String bucket, String queue, String region, String suffix, String prefix) throws IOException {
+    public SQSClientDriver(String bucket, String queue, String region, String profile, String suffix, String prefix) throws IOException {
         super();
         this.bucket = bucket;
         this.region = region;
+        this.profile = profile;
         this.queue = queue;
         this.suffix = suffix;
         this.prefix = prefix;
@@ -60,7 +64,7 @@ public class SQSClientDriver {
      */
     public void listBucketAndWriteToSQS() throws IOException {
         var mapper = new ObjectMapper();
-        var keys = S3BucketReader.listBucketKeys(this.region, this.bucket);
+        var keys = S3BucketReader.listBucketKeys(this.region, this.profile, this.bucket);
         logger.debug("{} key(s) found", keys.size());
         var filteredKeys = keys.stream().filter(key -> key.endsWith(suffix)).collect(Collectors.toList());
         var msgs = new ArrayList<String>(filteredKeys.size() * 2);
@@ -73,7 +77,7 @@ public class SQSClientDriver {
             msgs.add(json);
         }
 
-        var sqsHandler = new SQSHandler(this.queue);
+        var sqsHandler = new SQSHandler(this.queue, profile);
         sqsHandler.sendMessages(msgs);
 
         //for demo

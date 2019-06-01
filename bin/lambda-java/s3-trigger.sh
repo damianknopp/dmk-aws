@@ -30,12 +30,12 @@ cat << EOF > ./create-s3-lambda-trigger.json
 ]
 EOF
 # todo assign s3_src_arn for our demo
-aws lambda add-permission --function-name ${demo_function} \
+aws --profile ${profile} lambda add-permission --function-name ${demo_function} \
  --action lambda:InvokeFunction \
  --principal s3.amazonaws.com \
  --source-arn ${s3_src_arn} \
  --statement-id 1
 
-aws s3api put-bucket-notification-configuration \
+aws --profile ${profile} s3api put-bucket-notification-configuration \
 --bucket ${src_s3_bucket} \
 --notification-configuration file://create-s3-lambda-trigger.json

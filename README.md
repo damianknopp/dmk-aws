@@ -9,9 +9,10 @@ brew install jq
 brew install coreutils
 pip install awscli
 aws configure
-# set credentials in ~/.aws/credentials
-# give the credentials access to Kinesis, S3, SQS or subset that you are testing
 ```
+
+Set credentials in ~/.aws/credentials
+Give the credentials access to Kinesis, S3, SQS or subset that you are testing
 
 ## To build
 
@@ -19,11 +20,20 @@ aws configure
 mvn clean install
 ```
 
-## To use
-Create a `$proj_root/bin/acct.sh` file in the form of
+## To run
+Most times you would use the IAM role of your deployed instance to run code. However these script use a local configured profile for development
+
+To use, create a `$proj_root/bin/acct.sh` file in the form of
+
 ```
 acct=aws_account_id
 profile=default
+```
+
+To get your account id;
+
+```bash
+aws --profile default sts get-caller-identity
 ```
 
 The file is under .gitignore but verify it is never checked into the repo
