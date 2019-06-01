@@ -20,8 +20,18 @@ mvn clean install
 ```
 
 ## To use
-Create a ./bin/acct.sh file and enter one line with your account number `acct=1234`. The file is under .gitignore but verify it is never checked into the repo
+Create a `$proj_root/bin/acct.sh` file in the form of
+```
+acct=aws_account_id
+profile=default
+```
 
-See, [Kinesis Demo](kinesis-client/README.md)
+The file is under .gitignore but verify it is never checked into the repo
 
-See, [SQS Demo](sqs-client/README.md)
+See, a Java [Kinesis Client Demo](kinesis-client/README.md)
+
+See, a Java [SQS Client Demo](sqs-client/README.md)
+
+See, [Lambdas using Python](lambda-python/README.md)
+
+See, a Java [SQS Lambda](sqs-lambda/README.md)

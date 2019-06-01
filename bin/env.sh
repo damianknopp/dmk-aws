@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
+# print commands before running
+set -x
+
 cd $( dirname "${BASH_SOURCE[0]}" )
 source ./acct.sh
 
+profile=${profile:-default}
 version=1.0-SNAPSHOT
 region=us-east-1
 prefix="dknopp"
-stream_name="${prefix}-test-stream"
+stream_name="dmk-test"
 queue_name="${prefix}-test-queue"
 queue_arn="arn:aws:sqs:${region}:${acct}:${queue_name}"
 tags="environment=demo"

@@ -22,12 +22,16 @@ public class KinesisClientDriver {
     public static void main(String ...args) throws Exception {
         System.out.println("Writing sample records to Kinesis");
         String streamName = null;
+        String profileName = null;
         if (args.length > 0) {
             streamName = args[0];
+            if (args.length > 1) {
+              profileName = args[1];
+            }
         }
         var numRecords = 10;
         var driver = new KinesisClientDriver();
-        driver.writeSampleRecords(numRecords, streamName);
+        driver.writeSampleRecords(numRecords, streamName, profileName);
     }
 
     public KinesisClientDriver() throws Exception {
@@ -45,12 +49,12 @@ public class KinesisClientDriver {
      * https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-sdk.html
      * @param numRecords
      */
-    public void writeSampleRecords(int numRecords, String streamName) throws Exception {
+    public void writeSampleRecords(int numRecords, String streamName, String profileName) throws Exception {
         if (streamName == null) {
             streamName = this.defaultStreamName;
         }
         numRecords = numRecords > 4 ? numRecords : 10;
-        var kinesisClient = this.genKinesisClientConnection(this.region);
+        var kinesisClient = this.genKinesisClientConnection(this.region, profileName);
         var putRecordsRequest  = new PutRecordsRequest();
         putRecordsRequest.setStreamName(streamName);
         var putRecordsRequestEntryList  = new ArrayList<PutRecordsRequestEntry>();
@@ -71,10 +75,13 @@ public class KinesisClientDriver {
      * @return
      * @throws Exception
      */
-    private AmazonKinesis genKinesisClientConnection(String region) throws Exception {
+    private AmazonKinesis genKinesisClientConnection(String region, String profileName) throws Exception {
         AmazonKinesisClientBuilder clientBuilder = AmazonKinesisClientBuilder.standard();
         clientBuilder.setRegion(region);
-        var credentialsProvider = new ProfileCredentialsProvider();
+        ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
+        if (profileName != null) {
+          credentialsProvider = new ProfileCredentialsProvider(profileName);
+        }
         clientBuilder.setCredentials(credentialsProvider);
 //        clientBuilder.setClientConfiguration(config);
         var kinesisClient = clientBuilder.build();

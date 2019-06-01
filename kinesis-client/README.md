@@ -18,6 +18,12 @@ yum install jq
 
 ## To run
 
+Add a `$proj_root/bin/acct.sh` file in the form of
+```
+acct=aws_account_id
+profile=default
+```
+
 ```
 cd $proj_root
 ./bin/kinesis/list-streams.sh
