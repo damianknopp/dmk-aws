@@ -43,7 +43,7 @@ public class SQSClientDriver {
         if (cmd.hasOption("s")) {
             suffix = cmd.getOptionValue("s");
         }
-        var logMsg = String.format("region = %s, bucket = %s, queue = %s, suffix = %s", region, bucket, queue, suffix);
+        var logMsg = String.format("region = %s, profile = %s, bucket = %s, queue = %s, suffix = %s", region, profile, bucket, queue, suffix);
         System.out.println(logMsg);
         var driver = new SQSClientDriver(bucket, queue, region, profile, suffix, "");
         driver.listBucketAndWriteToSQS();
