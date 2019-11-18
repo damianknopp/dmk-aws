@@ -8,10 +8,10 @@ This project demonstrates how to manage an (EMR)[https://aws.amazon.com/emr/] cl
 * not set S3 consistent view (if you set to true, make sure to clean up the DynamoDB table)
 
 ## Dependencies
-To run these scripts you will need
+To run these scripts you will need to;
 
-* an AWS account
-* installed [awscli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+* create an AWS account
+* install [awscli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 * install [aws-vault](https://github.com/99designs/aws-vault)
 * configure the environment variables in the bash scripts
 
@@ -22,6 +22,7 @@ vi bin/env.sh
 ```
 
 * configure the cloudformation variables, set the s3 base bucket in `cloudformation/emr-phoenix.yml`
+
 ## Run
 
 Create a keypair `pem` file to be used by the cluster. This step will create the SSH keypair to be used by the EMR nodes
@@ -29,7 +30,7 @@ Create a keypair `pem` file to be used by the cluster. This step will create the
 ./bin/create-keypair.sh
 ```
 
-Create the EMR default roles. This step will create the service and job instance profile roles to be used in the EMR cluster
+Create the [EMR default roles](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-iam-roles.html). This step will create the service and job instance profile roles to be used in the EMR cluster. _Note: I had to create the default role out of band in the console due to permission with the AWS Vault federated user_
 ```
 ./bin/create-emr-default-roles.sh
 ```
