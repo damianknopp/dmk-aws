@@ -1,0 +1,247 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EMR Cluster CloudFormation Stack
+Parameters:
+  EMRClusterName:
+    Description: Name of the cluster
+    Type: String
+    Default: emr-phoenix
+  KeyName:
+    Description: Amazon EC2 Key Pair, must be an existing keyname
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: emr-phoenix
+  MasterInstanceType:
+    Description: Instance type to be used for the master instance.
+    Type: String
+    Default: m5.xlarge
+  CoreInstanceType:
+    Description: Instance type to be used for core instances.
+    Type: String
+    Default: m5.xlarge
+  NumberOfCoreInstances:
+    Description: Must be a valid number
+    Type: Number
+    Default: 1
+  # SubnetId:
+  #   Description: Must be Valid public subnet ID
+  #   Type: String
+  #   Default: subnet-xxxx
+  S3BaseUri:
+    Description: Must be a valid S3 URL
+    Type: String
+    Default: s3://mybucket/emr
+  S3LogsUri:
+    Description: Must be a valid S3 URL
+    Type: String
+    Default: s3://mybucket/emr/logs
+  HBaseDataUri:
+    Description: Must be a valid S3 bucket URL
+    Type: String
+    Default: s3://mybucket/emr/hbase
+  HiveDataUri:
+    Description: Must be a valid S3 bucket URL
+    Type: String
+    # Parameters Defaults cannot contain an intrinsic function
+    # Default: !Join ["/", [ !Ref S3BaseUri, "/hive"]]
+    Default: s3://mybucket/emr/hive
+  ReleaseLabel:
+    Description: Must be a valid EMR release version
+    Type: String
+    Default: emr-5.24.1
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.31.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref EMRClusterName, "-vpc"]]
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+  SubnetId1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: us-east-1c
+      CidrBlock: 172.31.0.0/16
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref EMRClusterName, "-subnet"]]
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+    DependsOn:
+      - VPC
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref EMRClusterName, "-rt"]]
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+    DependsOn:
+      - SubnetId1
+      - VPC
+  RouteTableSubnetAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetId1
+    DependsOn:
+      - RouteTable
+      - SubnetId1
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref EMRClusterName, "-ig"]]
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+    DependsOn:
+      - VPC
+  IGAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+    DependsOn:
+      - InternetGateway
+      - VPC
+  IGRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+    DependsOn:
+      - IGAttachment
+      - InternetGateway
+      - RouteTableSubnetAssociation
+      - RouteTable
+      - VPC
+  EMRSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh from my IP
+      GroupName: !Join ["", [!Ref EMRClusterName, "-sg"]]
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref EMRClusterName, "-sg"]]
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+      VpcId: !Ref VPC
+  SelfReferencingGroup:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: self referencing security group
+      FromPort: 0
+      ToPort: 65535
+      GroupId: !Ref EMRSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId: !Ref EMRSecurityGroup
+  PhoenixEMR:
+    Type: AWS::EMR::Cluster
+    Properties:
+      Applications:
+        - Name: Hadoop
+        - Name: Hive
+        - Name: HBase
+        - Name: Phoenix
+        - Name: Spark
+        - Name: Livy
+        - Name: Zookeeper
+        - Name: Pig
+      # BootstrapActions:
+      #   - BootstrapActionConfig
+      Configurations:
+        - Classification: spark-env
+          Configurations:
+            - Classification: export
+              ConfigurationProperties:
+                PYSPARK_PYTHON: /usr/bin/python3
+        - Classification: hbase
+          ConfigurationProperties:
+            "hbase.emr.storageMode": s3
+        - Classification: hbase-site
+          ConfigurationProperties:
+            "hbase.rootdir":
+              !Join ["/", [!Ref HBaseDataUri, !Ref EMRClusterName]]
+        - Classification: emrfs-site
+          ConfigurationProperties:
+            "fs.s3.consistent": false
+            "fs.s3.consistent.metadata.tableName":
+              !Join ["-", [!Ref EMRClusterName, "emr-metadata"]]
+            "fs.s3.enableServerSideEncryption": true
+        - Classification: hive-site
+          ConfigurationProperties:
+            "hive.metastore.client.factory.class": "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+            "hive.metastore.warehouse.dir":
+              !Join ["/", [!Ref HiveDataUri, !Ref EMRClusterName]]
+      Instances:
+        MasterInstanceFleet:
+          Name: Master Nodes
+          TargetOnDemandCapacity: 1
+          InstanceTypeConfigs:
+            - InstanceType: !Ref MasterInstanceType
+        CoreInstanceFleet:
+          Name: Slave Nodes
+          TargetOnDemandCapacity: !Ref NumberOfCoreInstances
+          InstanceTypeConfigs:
+            - InstanceType: !Ref CoreInstanceType
+        TerminationProtected: false
+        Ec2KeyName: !Ref KeyName
+        Ec2SubnetId: !Ref SubnetId1
+        KeepJobFlowAliveWhenNoSteps: true
+        AdditionalMasterSecurityGroups:
+          - !Ref EMRSecurityGroup
+        AdditionalSlaveSecurityGroups:
+          - !Ref EMRSecurityGroup
+      JobFlowRole: EMR_EC2_DefaultRole
+      LogUri: !Ref S3LogsUri
+      Name: !Ref EMRClusterName
+      ReleaseLabel: !Ref ReleaseLabel
+      # SecurityConfiguration: !Ref EMRSecurityGroup
+      ServiceRole: EMR_DefaultRole
+      # Steps:
+      #   - StepConfig
+      Tags:
+        - Key: Name
+          Value: !Ref EMRClusterName
+        - Key: Cluster
+          Value: !Ref EMRClusterName
+        - Key: Environment
+          Value: dev
+      VisibleToAllUsers: false
+    DependsOn:
+      - IGRoute
+      - RouteTable
+      - EMRSecurityGroup
+      - SelfReferencingGroup
+      - SubnetId1
+      - VPC
