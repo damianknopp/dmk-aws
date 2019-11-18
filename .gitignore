@@ -11,3 +11,6 @@ acct.sh
 build
 
 env
+
+**/keys/*
+**/bin/env.sh
