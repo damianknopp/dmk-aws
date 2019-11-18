@@ -12,5 +12,5 @@ build
 
 env
 
-keys/*
-bin/env.sh
+**/keys/*
+**/bin/env.sh
