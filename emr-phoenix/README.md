@@ -2,6 +2,7 @@
 
 This project demonstrates how to manage an [EMR](https://aws.amazon.com/emr/) cluster using [Cloudformation (CF)](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html). The EMR is configured to;
 
+* use yaml instead of json. this sample is inspired by the [AWS EMR](https://github.com/awslabs/aws-cloudformation-templates/tree/master/aws/services/EMR) json samples
 * install hbase, phoenix, hive, pig, spark
 * use S3 for data stored in hbase and hive
 * use glue as the hive meta store
