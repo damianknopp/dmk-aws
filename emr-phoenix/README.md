@@ -1,6 +1,6 @@
 # EMR And CloudFormation
 
-This project demonstrates how to manage an (EMR)[https://aws.amazon.com/emr/] cluster using Cloudformation (CF)[https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html]. The EMR is configured to;
+This project demonstrates how to manage an [EMR](https://aws.amazon.com/emr/) cluster using [Cloudformation (CF)](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html). The EMR is configured to;
 
 * install hbase, phoenix, hive, pig, spark
 * use S3 for data stored in hbase and hive
