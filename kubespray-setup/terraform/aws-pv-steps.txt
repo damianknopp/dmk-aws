@@ -1,0 +1,82 @@
+# these steps work with AWS EKS kubernetes v1.14 and kubespray v2.12.2 kubernetes v1.16.7 cloud:aws
+
+kubectl apply -f ebs-gp2-storageclass.yml
+# if using kubespray cloud aws then you need to set storageclass, eks has this set by default
+# gp2-storageclass.yml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zone: us-east-1b
+  iopsPerGB: "32"
+  
+aws-vault exec dmk-api -- aws eks update-kubeconfig --name dmk-eks1
+aws-vault exec dmk-api -- kubectl cluster-info
+aws-vault exec dmk-api -- kubectl get nodes -o wide
+aws-vault exec dmk-api -- kubectl apply -f ebs-claim1.json
+# ebs-claim1.json 
+{
+  "kind": "PersistentVolumeClaim",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "claim1",
+    "annotations": {
+        "volume.beta.kubernetes.io/storage-class": "gp2"
+    }
+  },
+  "spec": {
+    "accessModes": [
+      "ReadWriteOnce"
+    ],
+    "resources": {
+      "requests": {
+        "storage": "12Gi"
+      }
+    }
+  }
+}
+
+aws-vault exec dmk-api -- kubectl apply -f pv-pod.yml
+# pv-pod.yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pv-pod
+spec:
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: claim1
+  containers:
+    - name: pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: pv-storage
+  
+# wait for pod to start
+aws-vault exec dmk-api -- kubectl get po,pv,pvc
+# write a tmp file to /usr/share/nginx/html
+aws-vault exec dmk-api -- kubectl exec -it pod/pv-pod bash
+echo "persisted data" > /usr/share/nginx/html/tmp.txt
+# delete the pod 
+aws-vault exec dmk-api -- kubectl delete pod/pv-pod
+# start the container again
+aws-vault exec dmk-api -- kubectl apply -f pv-pod.yml
+# verify 
+aws-vault exec dmk-api -- kubectl exec -it pod/pv-pod cat /usr/share/nginx/html/tmp.txt
+# delete the pod 
+aws-vault exec dmk-api -- kubectl delete pod/pv-pod
+# delete the volume
+aws-vault exec dmk-api -- kubectl delete pvc/claim1
+# verify volume deleted
+aws-vault exec dmk-api -- kubectl get po,pv,pvc
+
