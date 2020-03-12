@@ -3,6 +3,6 @@
     "MaximumMessageSize": "262144",
     "MessageRetentionPeriod": "1209600",
     "ReceiveMessageWaitTimeSeconds": "0",
-    "RedrivePolicy": "{\"deadLetterTargetArn\": \"arn:aws:sqs:us-east-1:458073200073:dknopp-test-queue-dead\",\"maxReceiveCount\": \"5\"}",
+    "RedrivePolicy": "{\"deadLetterTargetArn\": \"arn:aws:sqs:us-east-1:xxx:dknopp-test-queue-dead\",\"maxReceiveCount\": \"5\"}",
     "VisibilityTimeout": "960"
 }
