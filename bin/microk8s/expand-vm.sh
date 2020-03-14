@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# NOTE: these steps did not really work, it increased memory but not cpu, and i had to restart things a few times
+# https://github.com/canonical/multipass/issues/1158
+
 # stop multipassd
 sudo launchctl unload /Library/LaunchDaemons/com.canonical.multipassd.plist
 
