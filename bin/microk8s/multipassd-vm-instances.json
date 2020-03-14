@@ -1,0 +1,44 @@
+{
+  "microk8s-vm": {
+    "deleted": false,
+    "disk_space": "42949672960",
+    "mac_addr": "52:54:00:24:b4:ba",
+    "mem_size": "6442450944",
+    "metadata": {
+    },
+    "mounts": [
+    ],
+    "num_cores": 1,
+    "ssh_username": "multipass",
+    "state": 0
+  },
+  "primary": {
+    "deleted": false,
+    "disk_space": "5368709120",
+    "mac_addr": "52:54:00:93:a8:3b",
+    "mem_size": "1073741824",
+    "metadata": {
+    },
+    "mounts": [
+      {
+        "gid_mappings": [
+          {
+            "host_gid": 20,
+            "instance_gid": -1
+          }
+        ],
+        "source_path": "/Users/damianknopp",
+        "target_path": "Home",
+        "uid_mappings": [
+          {
+            "host_uid": 501,
+            "instance_uid": -1
+          }
+        ]
+      }
+    ],
+    "num_cores": 4,
+    "ssh_username": "ubuntu",
+    "state": 0
+  }
+}
