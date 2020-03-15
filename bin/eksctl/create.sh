@@ -13,5 +13,5 @@ eksctl create cluster \
   --version=1.15 \
   --nodes=2 \
   --auto-kubeconfig \
-  --ssh-public-key=kube01 \
+  --ssh-public-key="${pem_name}" \
   --node-type=t3.xlarge

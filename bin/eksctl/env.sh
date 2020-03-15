@@ -4,8 +4,9 @@ set -x
 cd $(dirname "${BASH_SOURCE[0]}")
 
 export profile=dmk-api
-export cluster_name=dmk-eksctl1
+export cluster_name=eks01
 export kube_config=~/.kube/eksctl/clusters/"${cluster_name}"
+export pem_name=kube01
 
 ## awsvault defaults
 ##   -t, --session-ttl=4h           Expiration time for aws session
