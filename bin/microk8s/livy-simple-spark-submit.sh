@@ -10,5 +10,6 @@ curl -k -H 'Content-Type: application/json' -X POST -d '{
              "spark.kubernetes.authenticate.driver.serviceAccountName": "default"
          },
          "file": "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.3.jar",
-          "className": "org.apache.spark.examples.SparkPi"
+          "className": "org.apache.spark.examples.SparkPi",
+          "args": [ "1000" ]
        }' http://"${clusterIp}":8998/batches
