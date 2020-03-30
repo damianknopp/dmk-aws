@@ -14,4 +14,4 @@ eksctl create cluster \
   --nodes=2 \
   --auto-kubeconfig \
   --ssh-public-key="${pem_name}" \
-  --node-type=t3.xlarge
+  --node-type=t3.large

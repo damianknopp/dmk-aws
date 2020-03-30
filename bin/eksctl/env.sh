@@ -4,7 +4,7 @@ set -x
 cd $(dirname "${BASH_SOURCE[0]}")
 
 export profile=dmk-api
-export cluster_name=eks01
+export cluster_name=eks02
 export kube_config=~/.kube/eksctl/clusters/"${cluster_name}"
 export pem_name=kube01
 
